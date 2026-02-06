@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { LabelProduct, DesignRow, LaneEntry, ResultRow } from '../../types';
+import type { DesignRow, LaneEntry, ResultRow } from '../../types';
 import { formatNumber, roundUpToNext10, clampLanes, generateId } from '../../utils';
 import { useProducts } from '../../hooks';
 import { ProductManager } from '../ProductManager/ProductManager';
