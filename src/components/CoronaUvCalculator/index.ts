@@ -1,0 +1,1 @@
+export { CoronaUvCalculator } from './CoronaUvCalculator';
