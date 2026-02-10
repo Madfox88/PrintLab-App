@@ -140,6 +140,12 @@ header {
   border: 1px solid rgba(148, 163, 184, 0.5);
   color: var(--text-muted);
   background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.08), transparent 55%);
+  height: 50px;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 /* Tabs */

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import './App.css';
+import Lottie from 'lottie-react';
+import printlabAnimation from './assets/printlab_lottie.json';
 import {
   LabelCalculator,
   FlowpackCalculator,
@@ -63,7 +65,7 @@ function App() {
             <path d="M381.345,54.87c9.232,0 14.92,4.554 18.02,9.803l-9.104,4.806c-1.709,-2.784 -4.93,-4.997 -8.916,-4.997c-6.894,0 -11.76,5.313 -11.76,12.204c0,6.894 4.866,12.207 11.76,12.207c3.288,0 6.26,-1.138 7.969,-2.532l0,-3.54l-9.678,0l0,-9.044l20.364,0l0,16.505c-4.554,4.994 -10.686,8.217 -18.655,8.217c-12.583,0 -22.826,-8.409 -22.826,-21.815c0,-13.403 10.242,-21.815 22.826,-21.815" style={{fill:"#f1f2f2", fillRule:"nonzero"}}/>
           </svg>
         </div>
-        <div className="badge">PrintLab Calculator</div>
+        <Lottie animationData={printlabAnimation} loop={true} className="badge" />
       </header>
 
       <div className="app-layout">
