@@ -13,6 +13,7 @@ import type { CalculatorTab } from './types';
 
 function App() {
   const [activeTab, setActiveTab] = useState<CalculatorTab>('label');
+  const [labelTotalClicks, setLabelTotalClicks] = useState<number | null>(null);
 
   const tabs: { id: CalculatorTab; label: string }[] = [
     { id: 'label', label: 'Label Calculator' },
@@ -23,8 +24,9 @@ function App() {
   ];
 
   return (
-    <div className="app-shell">
-      <header>
+    <>
+      <div className="app-shell">
+        <header>
         <div className="brand">
           <svg 
             className="brand-logo"
@@ -69,23 +71,25 @@ function App() {
       </header>
 
       <div className="app-layout">
-        <aside className="sidebar-nav">
-          <div className="sidebar-title">Calculators</div>
-          <nav className="calculator-tabs">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </aside>
+        <div className="sidebar-wrapper">
+          <aside className="sidebar-nav">
+            <div className="sidebar-title">Calculators</div>
+            <nav className="calculator-tabs">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </aside>
+        </div>
 
         <main className="content-panel">
-          {activeTab === 'label' && <LabelCalculator />}
+          {activeTab === 'label' && <LabelCalculator onResultChange={setLabelTotalClicks} />}
           {activeTab === 'flowpack' && <FlowpackCalculator />}
           {activeTab === 'candyjar' && <CandyJarCalculator />}
           {activeTab === 'coronauv' && <CoronaUvCalculator />}
@@ -93,6 +97,14 @@ function App() {
         </main>
       </div>
     </div>
+    
+    {activeTab === 'label' && labelTotalClicks !== null && (
+      <div className="sidebar-result">
+        <div className="sidebar-result-label">Total Clicks</div>
+        <div className="sidebar-result-value">{labelTotalClicks.toLocaleString()}</div>
+      </div>
+    )}
+    </>
   );
 }
 

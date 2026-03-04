@@ -1,10 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { DesignRow, LaneEntry, ResultRow } from '../../types';
 import { formatNumber, roundUpToNext10, clampLanes, generateId } from '../../utils';
 import { useProducts } from '../../hooks';
 import { ProductManager } from '../ProductManager/ProductManager';
 
-export function LabelCalculator() {
+interface LabelCalculatorProps {
+  onResultChange?: (totalClicks: number | null) => void;
+}
+
+export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
   const { products, addProduct, updateProduct, deleteProduct, importProducts } = useProducts();
   const [selectedProductId, setSelectedProductId] = useState<string>(products[0]?.id || '');
   const [designs, setDesigns] = useState<DesignRow[]>([
@@ -115,6 +119,13 @@ export function LabelCalculator() {
 
     return { totalClicks, rows, totalJobLabels, totalLanes, rawClicks, maxRequired, extraLabels };
   }, [selectedProduct, laneEntries, designsWithEffectiveLanes]);
+
+  // Report results to parent component
+  useEffect(() => {
+    if (onResultChange) {
+      onResultChange(results?.totalClicks ?? null);
+    }
+  }, [results?.totalClicks, onResultChange]);
 
   const handleProductChange = (id: string) => {
     setSelectedProductId(id);
