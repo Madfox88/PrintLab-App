@@ -37,6 +37,7 @@ export const DEFAULT_LABEL_PRODUCTS: LabelProduct[] = [
   { id: "tee_dawn_68x90", label: "Tee Dawn 68 x 90 mm", maxLanes: 3, labelsPerClick: 36, extraClicks: 18 },
   { id: "tee_dawn_80x80", label: "Tee Dawn 80 x 80 mm", maxLanes: 3, labelsPerClick: 27, extraClicks: 18 },
   { id: "Collagen_115x300", label: "Collagen 115 x 300 mm", maxLanes: 2, labelsPerClick: 6, extraClicks: 20 },
+  { id: "90x140", label: "90 x 140 mm", maxLanes: 3, labelsPerClick: 18, extraClicks: 20 },
   { id: "diam73", label: "Ø73 mm", maxLanes: 3, labelsPerClick: 36, extraClicks: 18 },
   { id: "diam90", label: "Ø80 - Ø90 mm", maxLanes: 3, labelsPerClick: 27, extraClicks: 18 },
   { id: "diam48", label: "Ø48 mm", maxLanes: 5, labelsPerClick: 75, extraClicks: 18 },
