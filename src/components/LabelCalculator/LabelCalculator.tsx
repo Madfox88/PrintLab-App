@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import type { KeyboardEvent } from 'react';
 import type { DesignRow, LaneEntry, ResultRow } from '../../types';
 import { formatNumber, roundUpToNext10, clampLanes, generateId } from '../../utils';
 import { useProducts } from '../../hooks';
@@ -16,6 +17,7 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
   ]);
   const [showProductManager, setShowProductManager] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const designsListRef = useRef<HTMLDivElement | null>(null);
 
   const selectedProduct = useMemo(
     () => products.find((p) => p.id === selectedProductId) || products[0],
@@ -167,6 +169,39 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
     updateDesign(id, 'lanes', available);
   };
 
+  const focusNextRow = (row: number, col: string) => {
+    requestAnimationFrame(() => {
+      const next = designsListRef.current?.querySelector<HTMLInputElement>(
+        `input[data-row="${row}"][data-col="${col}"]`
+      );
+      if (next) {
+        next.focus();
+        next.select?.();
+      }
+    });
+  };
+
+  const handleEnterMove = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+
+    const row = Number(event.currentTarget.dataset.row);
+    const col = event.currentTarget.dataset.col;
+    if (!Number.isFinite(row) || !col) return;
+
+    const next = designsListRef.current?.querySelector<HTMLInputElement>(
+      `input[data-row="${row + 1}"][data-col="${col}"]`
+    );
+    if (next) {
+      next.focus();
+      next.select?.();
+      return;
+    }
+
+    addDesign();
+    focusNextRow(row + 1, col);
+  };
+
   return (
     <div className="tab-panel active">
       {/* Quick Guide Toggle */}
@@ -267,7 +302,7 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
           </div>
         </div>
 
-        <div className="designs-list">
+        <div className="designs-list" ref={designsListRef}>
           {designs.map((design, idx) => (
             <div key={design.id} className="design-row-card">
               <div className="design-cell design-name">
@@ -281,8 +316,11 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
                     type="number"
                     className="number-input"
                     min="0"
+                    data-row={idx}
+                    data-col="totalLabels"
                     value={design.totalLabels || ''}
                     onChange={(e) => updateDesign(design.id, 'totalLabels', Number(e.target.value) || 0)}
+                    onKeyDown={handleEnterMove}
                   />
                 </label>
               </div>
@@ -294,8 +332,11 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
                     className="number-input"
                     min="0"
                     max={selectedProduct?.maxLanes}
+                    data-row={idx}
+                    data-col="lanes"
                     value={designsWithEffectiveLanes[idx]?.effectiveLanes || ''}
                     onChange={(e) => updateDesign(design.id, 'lanes', Number(e.target.value) || 0)}
+                    onKeyDown={handleEnterMove}
                   />
                 </label>
               </div>

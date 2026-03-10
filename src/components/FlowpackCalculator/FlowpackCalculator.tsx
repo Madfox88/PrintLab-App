@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
+import type { KeyboardEvent } from 'react';
 import type { FlowpackDesignRow } from '../../types';
 import { formatNumber, generateId, clampLanes } from '../../utils';
 import {
@@ -11,6 +12,7 @@ export function FlowpackCalculator() {
   const [designs, setDesigns] = useState<FlowpackDesignRow[]>([
     { id: generateId(), name: 'Design 1', kg: 0, lanes: 0 },
   ]);
+  const tableRef = useRef<HTMLDivElement | null>(null);
 
   // Calculate effective lanes
   const designsWithEffectiveLanes = useMemo(() => {
@@ -123,6 +125,39 @@ export function FlowpackCalculator() {
     updateDesign(id, 'lanes', available);
   };
 
+  const focusNextRow = (row: number, col: string) => {
+    requestAnimationFrame(() => {
+      const next = tableRef.current?.querySelector<HTMLInputElement>(
+        `input[data-row="${row}"][data-col="${col}"]`
+      );
+      if (next) {
+        next.focus();
+        next.select?.();
+      }
+    });
+  };
+
+  const handleEnterMove = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+
+    const row = Number(event.currentTarget.dataset.row);
+    const col = event.currentTarget.dataset.col;
+    if (!Number.isFinite(row) || !col) return;
+
+    const next = tableRef.current?.querySelector<HTMLInputElement>(
+      `input[data-row="${row + 1}"][data-col="${col}"]`
+    );
+    if (next) {
+      next.focus();
+      next.select?.();
+      return;
+    }
+
+    addDesign();
+    focusNextRow(row + 1, col);
+  };
+
   return (
     <div>
       <section className="section">
@@ -159,7 +194,7 @@ export function FlowpackCalculator() {
           </div>
         </div>
 
-        <div className="table-wrapper">
+        <div className="table-wrapper" ref={tableRef}>
           <table>
             <thead>
               <tr>
@@ -184,10 +219,13 @@ export function FlowpackCalculator() {
                         className="number-input"
                         min="0"
                         step="0.1"
+                        data-row={idx}
+                        data-col="kg"
                         value={design.kg || ''}
                         onChange={(e) =>
                           updateDesign(design.id, 'kg', Number(e.target.value) || 0)
                         }
+                        onKeyDown={handleEnterMove}
                       />
                     </td>
                     <td>
@@ -196,10 +234,13 @@ export function FlowpackCalculator() {
                         className="number-input"
                         min="0"
                         max={FLOWPACK_CONFIG.maxLanesTotal}
+                        data-row={idx}
+                        data-col="lanes"
                         value={effective.effectiveLanes || ''}
                         onChange={(e) =>
                           updateDesign(design.id, 'lanes', Number(e.target.value) || 0)
                         }
+                        onKeyDown={handleEnterMove}
                       />
                     </td>
                     <td>{isActive && results ? formatNumber(results.clicks) : ''}</td>
