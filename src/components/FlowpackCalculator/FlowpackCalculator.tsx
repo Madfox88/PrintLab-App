@@ -66,8 +66,8 @@ export function FlowpackCalculator() {
       );
     }
 
-    const final = flowpackFinalize(base);
     const totalKgAll = active.reduce((sum, d) => sum + d.kg, 0);
+    const final = flowpackFinalize(base, totalKgAll);
     const usedLanes = active.reduce((sum, d) => sum + d.effectiveLanes, 0);
 
     return {

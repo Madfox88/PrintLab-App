@@ -65,8 +65,17 @@ export function flowpackInterpolate(
   return { clicks: 0, meters: 0 };
 }
 
-// Finalize flowpack calculation with rounding
-export function flowpackFinalize(base: { clicks: number; meters: number }): {
+// Extra clicks adjustment for new candy type (applies to all flowpack calculations)
+export const EXTRA_CLICKS_PER_KG = 1; // +10 clicks per 10 kg of candy foil
+export const SAFETY_CLICKS = 5; // flat safety margin added to the final result
+
+// Finalize flowpack calculation with rounding.
+// Adds 1 extra click per kg of candy plus a flat safety margin,
+// and scales meters correspondingly.
+export function flowpackFinalize(
+  base: { clicks: number; meters: number },
+  totalKg: number
+): {
   clicks: number;
   meters: number;
 } {
@@ -82,7 +91,10 @@ export function flowpackFinalize(base: { clicks: number; meters: number }): {
     return { clicks: 0, meters: 0 };
   }
 
-  const clicks = Math.ceil(baseClicks);
+  const kg = Number.isFinite(totalKg) && totalKg > 0 ? totalKg : 0;
+  const adjustedClicks = baseClicks + kg * EXTRA_CLICKS_PER_KG + SAFETY_CLICKS;
+
+  const clicks = Math.ceil(adjustedClicks);
   const mPerClick = baseMeters / baseClicks;
   const meters = Math.round((clicks * mPerClick) / 5) * 5;
 
