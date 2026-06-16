@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flowpack Calculator — Old vs New Calculation</title>
+<style>
+  :root {
+    --blue: #007dc5;
+    --cyan: #38bdf8;
+    --old: #94a3b8;
+    --new: #007dc5;
+    --diff: #d97706;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1e293b;
+    margin: 0;
+    padding: 32px 40px;
+    background: #fff;
+  }
+  h1 { color: var(--blue); font-size: 24px; margin: 0 0 4px; }
+  .subtitle { color: #64748b; font-size: 13px; margin-bottom: 20px; }
+  h2 { color: var(--blue); font-size: 16px; margin: 28px 0 8px; border-bottom: 2px solid var(--blue); padding-bottom: 4px; }
+  .formula-box {
+    display: flex; gap: 16px; margin: 12px 0;
+  }
+  .formula {
+    flex: 1; border-radius: 8px; padding: 12px 16px; font-size: 13px;
+  }
+  .formula.old { background: #f1f5f9; border: 1px solid #cbd5e1; }
+  .formula.new { background: #eff6ff; border: 1px solid var(--blue); }
+  .formula h3 { margin: 0 0 6px; font-size: 13px; }
+  .formula.old h3 { color: #64748b; }
+  .formula.new h3 { color: var(--blue); }
+  .formula code { font-family: Consolas, monospace; font-size: 12px; display: block; margin: 2px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 11.5px; margin: 8px 0 16px; }
+  th, td { border: 1px solid #cbd5e1; padding: 4px 8px; text-align: right; }
+  th { background: var(--blue); color: #fff; text-align: center; }
+  td:first-child { text-align: center; font-weight: 600; }
+  .old-col { color: #64748b; }
+  .new-col { color: var(--blue); font-weight: 600; }
+  .diff-col { color: var(--diff); font-weight: 600; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .legend { font-size: 12px; margin: 6px 0; }
+  .legend span { display: inline-block; margin-right: 18px; }
+  .swatch { display: inline-block; width: 22px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+  .note { font-size: 11px; color: #64748b; margin-top: 4px; }
+  .page-break { page-break-before: always; }
+  footer { margin-top: 24px; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+</style>
+</head>
+<body>
+
+<h1>Flowpack Calculator — Old vs New Calculation</h1>
+<div class="subtitle">Change: +1 click per kg of candy foil (new candy type) + 5 safety clicks &nbsp;|&nbsp; Generated June 11, 2026</div>
+
+<div class="formula-box">
+  <div class="formula old">
+    <h3>OLD formula</h3>
+    <code>clicks = ceil( baseClicks )</code>
+    <code>meters = round( clicks × m/click ÷ 5 ) × 5</code>
+  </div>
+  <div class="formula new">
+    <h3>NEW formula</h3>
+    <code>clicks = ceil( baseClicks + totalKg × 1 + 5 )</code>
+    <code>meters = round( clicks × m/click ÷ 5 ) × 5</code>
+  </div>
+</div>
+
+<h2>Mode: "3 ens FP" (same design on all 3 lanes)</h2>
+<div id="chart3"></div>
+<div class="legend">
+  <span><span class="swatch" style="background:#94a3b8"></span>Old clicks</span>
+  <span><span class="swatch" style="background:#007dc5"></span>New clicks</span>
+</div>
+<div id="table3"></div>
+
+<div class="page-break"></div>
+
+<h2>Mode: "1 FP pr lane" (mix mode — table lookup at totalKg ÷ 3)</h2>
+<div id="chart1"></div>
+<div class="legend">
+  <span><span class="swatch" style="background:#94a3b8"></span>Old clicks</span>
+  <span><span class="swatch" style="background:#007dc5"></span>New clicks</span>
+</div>
+<div id="table1"></div>
+<div class="note">In "1 FP pr lane" mode the interpolation table is looked up at totalKg ÷ 3, while the extra clicks are based on the full total kg.</div>
+
+<footer>PrintLab Calculator — flowpackConfig.ts: EXTRA_CLICKS_PER_KG = 1, SAFETY_CLICKS = 5. Applies to every flowpack calculation in both lane modes.</footer>
+
+<script>
+// === Exact replication of src/config/flowpackConfig.ts ===
+const CFG = {
+  kgPoints: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100],
+  clicks1: [90, 165, 235, 315, 385, 455, 530, 605, 671, 830, 1125, 1495],
+  meters1: [80, 150, 220, 295, 360, 435, 505, 580, 645, 795, 1090, 1440],
+  clicks3: [35, 60, 85, 110, 135, 155, 180, 205, 230, 280, 380, 500],
+  meters3: [25, 45, 70, 95, 115, 140, 165, 190, 210, 260, 360, 475],
+};
+const EXTRA_CLICKS_PER_KG = 1;
+const SAFETY_CLICKS = 5;
+
+function interpolate(kg, points, clicksArr, metersArr) {
+  const x = Number(kg);
+  if (!Number.isFinite(x) || x <= 0) return { clicks: 0, meters: 0 };
+  const firstKg = points[0], lastKg = points[points.length - 1];
+  if (x <= firstKg) {
+    const f = x / firstKg;
+    return { clicks: clicksArr[0] * f, meters: metersArr[0] * f };
+  }
+  if (x >= lastKg) {
+    const f = x / lastKg;
+    return { clicks: clicksArr[clicksArr.length - 1] * f, meters: metersArr[metersArr.length - 1] * f };
+  }
+  for (let i = 0; i < points.length - 1; i++) {
+    const x0 = points[i], x1 = points[i + 1];
+    if (x >= x0 && x <= x1) {
+      const t = (x - x0) / (x1 - x0);
+      return {
+        clicks: clicksArr[i] + (clicksArr[i + 1] - clicksArr[i]) * t,
+        meters: metersArr[i] + (metersArr[i + 1] - metersArr[i]) * t,
+      };
+    }
+  }
+  return { clicks: 0, meters: 0 };
+}
+
+function finalizeOld(base) {
+  if (base.clicks <= 0 || base.meters <= 0) return { clicks: 0, meters: 0 };
+  const clicks = Math.ceil(base.clicks);
+  const mPerClick = base.meters / base.clicks;
+  return { clicks, meters: Math.round((clicks * mPerClick) / 5) * 5 };
+}
+
+function finalizeNew(base, totalKg) {
+  if (base.clicks <= 0 || base.meters <= 0) return { clicks: 0, meters: 0 };
+  const kg = totalKg > 0 ? totalKg : 0;
+  const clicks = Math.ceil(base.clicks + kg * EXTRA_CLICKS_PER_KG + SAFETY_CLICKS);
+  const mPerClick = base.meters / base.clicks;
+  return { clicks, meters: Math.round((clicks * mPerClick) / 5) * 5 };
+}
+
+// === Build comparison data ===
+function buildRows(mode) {
+  // mode '3': kgForTable = totalKg; mode '1': totalKg values, lookup at totalKg/3
+  const totals = mode === '3'
+    ? CFG.kgPoints.slice()
+    : [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 225, 300];
+  return totals.map((totalKg) => {
+    const kgForTable = mode === '3' ? totalKg : totalKg / 3;
+    const base = mode === '3'
+      ? interpolate(kgForTable, CFG.kgPoints, CFG.clicks3, CFG.meters3)
+      : interpolate(kgForTable, CFG.kgPoints, CFG.clicks1, CFG.meters1);
+    const o = finalizeOld(base);
+    const n = finalizeNew(base, totalKg);
+    return { totalKg, kgForTable, o, n };
+  });
+}
+
+function renderTable(rows, elId, showLookup) {
+  const fmt = (v) => v.toLocaleString('da-DK');
+  let html = '<table><tr><th>Total kg</th>' +
+    (showLookup ? '<th>Table lookup kg</th>' : '') +
+    '<th class="old-col">Old clicks</th><th>New clicks</th><th>Δ clicks</th>' +
+    '<th class="old-col">Old meters</th><th>New meters</th><th>Δ meters</th></tr>';
+  for (const r of rows) {
+    html += `<tr><td>${fmt(r.totalKg)}</td>` +
+      (showLookup ? `<td>${fmt(r.kgForTable)}</td>` : '') +
+      `<td class="old-col">${fmt(r.o.clicks)}</td><td class="new-col">${fmt(r.n.clicks)}</td>` +
+      `<td class="diff-col">+${fmt(r.n.clicks - r.o.clicks)}</td>` +
+      `<td class="old-col">${fmt(r.o.meters)}</td><td class="new-col">${fmt(r.n.meters)}</td>` +
+      `<td class="diff-col">+${fmt(r.n.meters - r.o.meters)}</td></tr>`;
+  }
+  html += '</table>';
+  document.getElementById(elId).innerHTML = html;
+}
+
+function renderChart(rows, elId) {
+  const W = 700, H = 260, padL = 50, padB = 34, padT = 12, padR = 14;
+  const xs = rows.map((r) => r.totalKg);
+  const maxX = Math.max(...xs);
+  const maxY = Math.max(...rows.map((r) => r.n.clicks)) * 1.08;
+  const sx = (x) => padL + (x / maxX) * (W - padL - padR);
+  const sy = (y) => H - padB - (y / maxY) * (H - padB - padT);
+  const path = (key) => rows.map((r, i) => (i ? 'L' : 'M') + sx(r.totalKg).toFixed(1) + ',' + sy(r[key].clicks).toFixed(1)).join(' ');
+
+  let grid = '';
+  const ySteps = 5;
+  for (let i = 0; i <= ySteps; i++) {
+    const yv = Math.round((maxY / ySteps) * i);
+    const y = sy(yv);
+    grid += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#e2e8f0" stroke-width="1"/>`;
+    grid += `<text x="${padL - 6}" y="${y + 3}" font-size="9" fill="#64748b" text-anchor="end">${yv}</text>`;
+  }
+  let xlabels = '';
+  for (const r of rows) {
+    xlabels += `<text x="${sx(r.totalKg)}" y="${H - padB + 14}" font-size="9" fill="#64748b" text-anchor="middle">${r.totalKg}</text>`;
+  }
+  const dots = (key, color) => rows.map((r) =>
+    `<circle cx="${sx(r.totalKg).toFixed(1)}" cy="${sy(r[key].clicks).toFixed(1)}" r="2.5" fill="${color}"/>`).join('');
+
+  document.getElementById(elId).innerHTML =
+    `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      ${grid}${xlabels}
+      <text x="${(padL + W - padR) / 2}" y="${H - 4}" font-size="10" fill="#475569" text-anchor="middle">Total kg of candy</text>
+      <text x="12" y="${(padT + H - padB) / 2}" font-size="10" fill="#475569" text-anchor="middle" transform="rotate(-90 12 ${(padT + H - padB) / 2})">Clicks</text>
+      <path d="${path('o')}" fill="none" stroke="#94a3b8" stroke-width="2"/>
+      <path d="${path('n')}" fill="none" stroke="#007dc5" stroke-width="2.5"/>
+      ${dots('o', '#94a3b8')}${dots('n', '#007dc5')}
+    </svg>`;
+}
+
+const rows3 = buildRows('3');
+const rows1 = buildRows('1');
+renderChart(rows3, 'chart3');
+renderTable(rows3, 'table3', false);
+renderChart(rows1, 'chart1');
+renderTable(rows1, 'table1', true);
+</script>
+</body>
+</html>
