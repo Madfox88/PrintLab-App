@@ -42,6 +42,7 @@ export const DEFAULT_LABEL_PRODUCTS: LabelProduct[] = [
   { id: "Soap_bubbles_72x105", label: "Soap bubbles 72 x 105 mm", maxLanes: 3, labelsPerClick: 27, extraClicks: 18 },
   { id: "Collagen_115x300", label: "Collagen 115 x 300 mm", maxLanes: 2, labelsPerClick: 6, extraClicks: 20 },
   { id: "90x140", label: "90 x 140 mm", maxLanes: 3, labelsPerClick: 18, extraClicks: 20 },
+  { id: "90x117", label: "90 x 117 mm", maxLanes: 3, labelsPerClick: 18, extraClicks: 20 },
   { id: "19x16", label: "19 x 16 mm", maxLanes: 8, labelsPerClick: 240, extraClicks: 15 },
   { id: "diam73", label: "Ø73 mm", maxLanes: 3, labelsPerClick: 36, extraClicks: 18 },
   { id: "diam90", label: "Ø80 - Ø90 mm", maxLanes: 3, labelsPerClick: 27, extraClicks: 18 },
