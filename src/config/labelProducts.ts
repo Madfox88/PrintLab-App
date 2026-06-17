@@ -39,6 +39,7 @@ export const DEFAULT_LABEL_PRODUCTS: LabelProduct[] = [
   { id: "tee_dawn_68x90", label: "Tee Dawn 68 x 90 mm", maxLanes: 3, labelsPerClick: 36, extraClicks: 18 },
   { id: "tee_dawn_80x80", label: "Tee Dawn 80 x 80 mm", maxLanes: 3, labelsPerClick: 27, extraClicks: 18 },
   { id: "tee_dawn_100x68", label: "Tee Dawn 100 x 68 mm", maxLanes: 3, labelsPerClick: 36, extraClicks: 18 },
+  { id: "Soap_bubbles_72x105", label: "Soap bubbles 72 x 105 mm", maxLanes: 3, labelsPerClick: 27, extraClicks: 18 },
   { id: "Collagen_115x300", label: "Collagen 115 x 300 mm", maxLanes: 2, labelsPerClick: 6, extraClicks: 20 },
   { id: "90x140", label: "90 x 140 mm", maxLanes: 3, labelsPerClick: 18, extraClicks: 20 },
   { id: "19x16", label: "19 x 16 mm", maxLanes: 8, labelsPerClick: 240, extraClicks: 15 },
