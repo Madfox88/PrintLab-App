@@ -13,12 +13,17 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
   const { products, addProduct, updateProduct, deleteProduct, importProducts } = useProducts();
   const [selectedProductId, setSelectedProductId] = useState<string>(products[0]?.id || '');
   const [productSearch, setProductSearch] = useState('');
+  const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
+  const [highlightedProductIndex, setHighlightedProductIndex] = useState(-1);
   const [designs, setDesigns] = useState<DesignRow[]>([
     { id: generateId(), name: 'Design 1', totalLabels: 0, lanes: 0 },
   ]);
   const [showProductManager, setShowProductManager] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const designsListRef = useRef<HTMLDivElement | null>(null);
+  const productComboboxRef = useRef<HTMLDivElement | null>(null);
+  const productTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const productSearchInputRef = useRef<HTMLInputElement | null>(null);
 
   const selectedProduct = useMemo(
     () => products.find((p) => p.id === selectedProductId) || products[0],
@@ -29,17 +34,10 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
     const query = productSearch.trim().toLowerCase();
     if (!query) return products;
 
-    const matchedProducts = products.filter((product) => {
+    return products.filter((product) => {
       const searchableText = `${product.label} ${product.id} ${product.isCustom ? 'custom' : 'standard'}`.toLowerCase();
       return searchableText.includes(query);
     });
-
-    const selected = products.find((product) => product.id === selectedProductId);
-    if (selected && !matchedProducts.some((product) => product.id === selected.id)) {
-      return [selected, ...matchedProducts];
-    }
-
-    return matchedProducts;
   }, [productSearch, products, selectedProductId]);
 
   // Calculate effective lanes (clamped to maxLanes)
@@ -152,6 +150,121 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
     setDesigns([{ id: generateId(), name: 'Design 1', totalLabels: 0, lanes: 0 }]);
   };
 
+  const closeProductMenu = (restoreFocus = false) => {
+    setIsProductMenuOpen(false);
+    setProductSearch('');
+    setHighlightedProductIndex(-1);
+
+    if (restoreFocus) {
+      requestAnimationFrame(() => {
+        productTriggerRef.current?.focus();
+      });
+    }
+  };
+
+  const openProductMenu = () => {
+    setIsProductMenuOpen(true);
+  };
+
+  const handleProductSelect = (id: string) => {
+    handleProductChange(id);
+    closeProductMenu(true);
+  };
+
+  const moveProductHighlight = (direction: 1 | -1) => {
+    if (filteredProducts.length === 0) return;
+
+    setHighlightedProductIndex((prev) => {
+      if (prev < 0) {
+        const selectedIndex = filteredProducts.findIndex((product) => product.id === selectedProductId);
+        if (selectedIndex >= 0) return selectedIndex;
+        return direction > 0 ? 0 : filteredProducts.length - 1;
+      }
+
+      return (prev + direction + filteredProducts.length) % filteredProducts.length;
+    });
+  };
+
+  const handleProductTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      openProductMenu();
+      return;
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      if (isProductMenuOpen) {
+        closeProductMenu(false);
+      } else {
+        openProductMenu();
+      }
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeProductMenu(false);
+    }
+  };
+
+  const handleProductSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      moveProductHighlight(1);
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveProductHighlight(-1);
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      if (highlightedProductIndex >= 0 && filteredProducts[highlightedProductIndex]) {
+        handleProductSelect(filteredProducts[highlightedProductIndex].id);
+      }
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeProductMenu(true);
+    }
+  };
+
+  useEffect(() => {
+    if (!isProductMenuOpen) return;
+
+    const selectedIndex = filteredProducts.findIndex((product) => product.id === selectedProductId);
+    setHighlightedProductIndex(selectedIndex >= 0 ? selectedIndex : filteredProducts.length > 0 ? 0 : -1);
+
+    requestAnimationFrame(() => {
+      productSearchInputRef.current?.focus();
+    });
+  }, [filteredProducts, isProductMenuOpen, selectedProductId]);
+
+  useEffect(() => {
+    if (!isProductMenuOpen) return;
+
+    const handleOutsidePointer = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      if (!productComboboxRef.current?.contains(target)) {
+        closeProductMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsidePointer);
+    document.addEventListener('touchstart', handleOutsidePointer);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsidePointer);
+      document.removeEventListener('touchstart', handleOutsidePointer);
+    };
+  }, [isProductMenuOpen]);
+
   const addDesign = () => {
     if (!selectedProduct) return;
     const usedLanes = designsWithEffectiveLanes.reduce((sum, d) => sum + d.effectiveLanes, 0);
@@ -252,34 +365,66 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
         </div>
         <div className="product-size">
           <div className="product-picker">
-            <label>
-              Search products
-              <input
-                type="text"
-                value={productSearch}
-                onChange={(e) => setProductSearch(e.target.value)}
-                placeholder="Type to filter products"
-              />
-            </label>
-            <label>
-              Product
-              <select value={selectedProductId} onChange={(e) => handleProductChange(e.target.value)}>
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.label} {p.isCustom ? '(custom)' : ''}
-                    </option>
-                  ))
-                ) : (
-                  <option value="" disabled>
-                    No matching products
-                  </option>
-                )}
-              </select>
-            </label>
-            {productSearch.trim() && filteredProducts.length === 0 && (
-              <span className="muted product-search-empty">No products match “{productSearch.trim()}”.</span>
-            )}
+            <div className="product-combobox" ref={productComboboxRef}>
+              <span className="product-combobox-label">Product</span>
+              <button
+                type="button"
+                ref={productTriggerRef}
+                className="product-combobox-trigger"
+                onClick={() => {
+                  if (isProductMenuOpen) {
+                    closeProductMenu(false);
+                  } else {
+                    openProductMenu();
+                  }
+                }}
+                onKeyDown={handleProductTriggerKeyDown}
+                aria-haspopup="listbox"
+                aria-expanded={isProductMenuOpen}
+              >
+                <span className="product-combobox-value">
+                  {selectedProduct ? `${selectedProduct.label}${selectedProduct.isCustom ? ' (custom)' : ''}` : 'Select product'}
+                </span>
+              </button>
+
+              {isProductMenuOpen && (
+                <div className="product-combobox-menu" role="listbox" aria-label="Product options">
+                  <div className="product-combobox-search-wrap">
+                    <input
+                      ref={productSearchInputRef}
+                      type="text"
+                      value={productSearch}
+                      onChange={(e) => setProductSearch(e.target.value)}
+                      onKeyDown={handleProductSearchKeyDown}
+                      placeholder="Search products"
+                    />
+                  </div>
+                  <div className="product-combobox-options">
+                    {filteredProducts.length > 0 ? (
+                      filteredProducts.map((product, index) => {
+                        const isSelected = product.id === selectedProductId;
+                        const isHighlighted = index === highlightedProductIndex;
+                        return (
+                          <button
+                            key={product.id}
+                            type="button"
+                            className={`product-combobox-option${isSelected ? ' is-selected' : ''}${isHighlighted ? ' is-highlighted' : ''}`}
+                            role="option"
+                            aria-selected={isSelected}
+                            onMouseEnter={() => setHighlightedProductIndex(index)}
+                            onClick={() => handleProductSelect(product.id)}
+                          >
+                            {product.label} {product.isCustom ? '(custom)' : ''}
+                          </button>
+                        );
+                      })
+                    ) : (
+                      <div className="product-combobox-empty">No matching products</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
             <span className="pill-highlight">Change product resets designs</span>
           </div>
 

@@ -569,6 +569,122 @@ button:disabled {
   width: 100%;
 }
 
+.product-combobox {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-combobox-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.product-combobox-trigger {
+  width: 100%;
+  min-width: 230px;
+  height: var(--control-height);
+  line-height: var(--control-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px 0 var(--control-padding-x);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-main);
+  font-size: 0.86rem;
+  outline: none;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.product-combobox-trigger:hover {
+  border-color: rgba(148, 163, 184, 0.7);
+}
+
+.product-combobox-trigger:focus,
+.product-combobox-trigger[aria-expanded='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+  background-color: rgba(15, 23, 42, 0.95);
+}
+
+.product-combobox-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-combobox-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  box-shadow: 0 12px 24px rgba(2, 6, 23, 0.6);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-combobox-search-wrap input[type='text'] {
+  width: 100%;
+}
+
+.product-combobox-options {
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow-y: auto;
+  gap: 4px;
+}
+
+.product-combobox-option {
+  width: 100%;
+  height: auto;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  min-height: 34px;
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.product-combobox-option.is-highlighted {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.product-combobox-option.is-selected {
+  color: #e0f2fe;
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(56, 189, 248, 0.18);
+}
+
+.product-combobox-empty {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 8px 10px;
+}
+
 .product-picker .pill-highlight {
   align-self: flex-start;
   margin-top: auto;
