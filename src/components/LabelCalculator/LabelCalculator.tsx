@@ -12,6 +12,7 @@ interface LabelCalculatorProps {
 export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
   const { products, addProduct, updateProduct, deleteProduct, importProducts } = useProducts();
   const [selectedProductId, setSelectedProductId] = useState<string>(products[0]?.id || '');
+  const [productSearch, setProductSearch] = useState('');
   const [designs, setDesigns] = useState<DesignRow[]>([
     { id: generateId(), name: 'Design 1', totalLabels: 0, lanes: 0 },
   ]);
@@ -23,6 +24,23 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
     () => products.find((p) => p.id === selectedProductId) || products[0],
     [products, selectedProductId]
   );
+
+  const filteredProducts = useMemo(() => {
+    const query = productSearch.trim().toLowerCase();
+    if (!query) return products;
+
+    const matchedProducts = products.filter((product) => {
+      const searchableText = `${product.label} ${product.id} ${product.isCustom ? 'custom' : 'standard'}`.toLowerCase();
+      return searchableText.includes(query);
+    });
+
+    const selected = products.find((product) => product.id === selectedProductId);
+    if (selected && !matchedProducts.some((product) => product.id === selected.id)) {
+      return [selected, ...matchedProducts];
+    }
+
+    return matchedProducts;
+  }, [productSearch, products, selectedProductId]);
 
   // Calculate effective lanes (clamped to maxLanes)
   const designsWithEffectiveLanes = useMemo(() => {
@@ -235,15 +253,33 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
         <div className="product-size">
           <div className="product-picker">
             <label>
+              Search products
+              <input
+                type="text"
+                value={productSearch}
+                onChange={(e) => setProductSearch(e.target.value)}
+                placeholder="Type to filter products"
+              />
+            </label>
+            <label>
               Product
               <select value={selectedProductId} onChange={(e) => handleProductChange(e.target.value)}>
-                {products.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.label} {p.isCustom ? '(custom)' : ''}
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label} {p.isCustom ? '(custom)' : ''}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>
+                    No matching products
                   </option>
-                ))}
+                )}
               </select>
             </label>
+            {productSearch.trim() && filteredProducts.length === 0 && (
+              <span className="muted product-search-empty">No products match “{productSearch.trim()}”.</span>
+            )}
             <span className="pill-highlight">Change product resets designs</span>
           </div>
 

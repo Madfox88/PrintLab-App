@@ -557,9 +557,25 @@ button:disabled {
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.35));
 }
 
+.product-picker label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.product-picker input[type='text'] {
+  width: 100%;
+}
+
 .product-picker .pill-highlight {
   align-self: flex-start;
   margin-top: auto;
+}
+
+.product-search-empty {
+  margin-top: -2px;
 }
 
 .product-summary {
