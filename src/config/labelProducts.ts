@@ -43,6 +43,7 @@ export const DEFAULT_LABEL_PRODUCTS: LabelProduct[] = [
   { id: "mm115x300", label: "115 x 300 mm", maxLanes: 2, labelsPerClick: 6, extraClicks: 18 },
   { id: "Collagen_115x300", label: "115 x 300 mm Collagen", maxLanes: 2, labelsPerClick: 6, extraClicks: 20 },
   { id: "Booster_118x202", label: "118 x 202 mm Booster", maxLanes: 2, labelsPerClick: 8, extraClicks: 20 },
+  { id: "Booster_118x202", label: "118 x 202 mm Booster", maxLanes: 2, labelsPerClick: 8, extraClicks: 20 },
   { id: "energidrik_122x172", label: "122 x 172 mm Energidrik", maxLanes: 2, labelsPerClick: 10, extraClicks: 18 },
   { id: "LOHILO_126x181", label: "126 x 181 mm LOHILO", maxLanes: 2, labelsPerClick: 8, extraClicks: 25 },
   { id: "p196x48", label: "196 x 48 mm Penta-Petit", maxLanes: 6, labelsPerClick: 4, extraClicks: 18 },
