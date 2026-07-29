@@ -8,7 +8,7 @@ export const DEFAULT_LABEL_PRODUCTS: LabelProduct[] = [
   { id: "mm35x25", label: "35 x 25 mm", maxLanes: 7, labelsPerClick: 210, extraClicks: 18 },
   { id: "mm30x50_L", label: '30 x 50 mm " L "', maxLanes: 8, labelsPerClick: 128, extraClicks: 18 },
   { id: "mm35x100", label: "35 x 100 mm", maxLanes: 8, labelsPerClick: 64, extraClicks: 18 },
-  { id: "mm40x120", label: "40 x 120 mm", maxLanes: 2, labelsPerClick: 40, extraClicks: 18 },
+  { id: "ish_mm40x120", label: "40 x 120 mm Ish", maxLanes: 2, labelsPerClick: 40, extraClicks: 18 },
   { id: "papvand_shots_45x118", label: "45 x 118 mm Papvand/Shots", maxLanes: 6, labelsPerClick: 36, extraClicks: 18 },
   { id: "mm45x75", label: "45 x 75 mm", maxLanes: 6, labelsPerClick: 72, extraClicks: 18 },
   { id: "mm50x30_S", label: '50 x 30 mm " S "', maxLanes: 5, labelsPerClick: 120, extraClicks: 18 },
