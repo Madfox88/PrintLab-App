@@ -15,6 +15,7 @@ export const DEFAULT_LABEL_PRODUCTS: LabelProduct[] = [
   { id: "luksus_brod_50x140", label: "50 x 140 mm Luksus brød", maxLanes: 2, labelsPerClick: 14, extraClicks: 18 },
   { id: "mm50x50", label: "50 x 50 mm", maxLanes: 5, labelsPerClick: 75, extraClicks: 18 },
   { id: "mm50x70_L", label: '50 x 70 mm " L "', maxLanes: 4, labelsPerClick: 48, extraClicks: 18 },
+  { id: "mogu_mm50x100", label: "50 x 100 mm Mogu", maxLanes: 5, labelsPerClick: 45, extraClicks: 18 },
   { id: "Dolu_52x201", label: "52 x 201 mm Dolu", maxLanes: 5, labelsPerClick: 20, extraClicks: 18 },
   { id: "luksus_brod_front_58x50", label: "58 x 50 mm Luksus brød Front", maxLanes: 5, labelsPerClick: 70, extraClicks: 18 },
   { id: "luksus_brod_back_58x80", label: "58 x 80 mm Luksus brød Back", maxLanes: 5, labelsPerClick: 50, extraClicks: 18 },
