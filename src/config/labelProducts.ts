@@ -19,6 +19,7 @@ export const DEFAULT_LABEL_PRODUCTS: LabelProduct[] = [
   { id: "Dolu_52x201", label: "52 x 201 mm Dolu", maxLanes: 5, labelsPerClick: 20, extraClicks: 18 },
   { id: "luksus_brod_front_58x50", label: "58 x 50 mm Luksus brød Front", maxLanes: 5, labelsPerClick: 70, extraClicks: 18 },
   { id: "luksus_brod_back_58x80", label: "58 x 80 mm Luksus brød Back", maxLanes: 5, labelsPerClick: 50, extraClicks: 18 },
+  { id: "kombucha_forside_60x65", label: "60 x 65 mm Kombucha Forside", maxLanes: 4, labelsPerClick: 60, extraClicks: 18 },
   { id: "monster_L_60x95", label: "60 x 95 mm Monster L", maxLanes: 4, labelsPerClick: 36, extraClicks: 18 },
   { id: "prima_62x204", label: "62 x 204 mm Prima", maxLanes: 4, labelsPerClick: 16, extraClicks: 18 },
   { id: "kidi_deco_63x88", label: "63 x 88 mm Kidi Deco", maxLanes: 4, labelsPerClick: 32, extraClicks: 18 },
