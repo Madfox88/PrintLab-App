@@ -25,6 +25,7 @@ export const DEFAULT_LABEL_PRODUCTS: LabelProduct[] = [
   { id: "tee_dawn_68x90", label: "68 x 90 mm Tee Dawn", maxLanes: 3, labelsPerClick: 36, extraClicks: 18 },
   { id: "mm70x50_S", label: '70 x 50 mm " S "', maxLanes: 4, labelsPerClick: 64, extraClicks: 18 },
   { id: "saharas_70x180", label: "70 x 180 mm Saharas", maxLanes: 4, labelsPerClick: 16, extraClicks: 18 },
+  { id: "istid_tube_mm70x215", label: "70 x 215 mm Istid Tube", maxLanes: 4, labelsPerClick: 16, extraClicks: 18 },
   { id: "Soap_bubbles_72x105", label: "72 x 105 mm Soap bubbles", maxLanes: 3, labelsPerClick: 27, extraClicks: 18 },
   { id: "Hede_TIK_73x110", label: "73 x 110 mm Hede TIK", maxLanes: 4, labelsPerClick: 24, extraClicks: 18 },
   { id: "mm75x135", label: "75 x 135 mm", maxLanes: 3, labelsPerClick: 18, extraClicks: 18 },
