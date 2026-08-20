@@ -23,6 +23,7 @@ export const DEFAULT_LABEL_PRODUCTS: LabelProduct[] = [
   { id: "monster_L_60x95", label: "60 x 95 mm Monster L", maxLanes: 4, labelsPerClick: 36, extraClicks: 18 },
   { id: "prima_62x204", label: "62 x 204 mm Prima", maxLanes: 4, labelsPerClick: 16, extraClicks: 18 },
   { id: "kidi_deco_63x88", label: "63 x 88 mm Kidi Deco", maxLanes: 4, labelsPerClick: 32, extraClicks: 18 },
+  { id: "Stjerne_65x40", label: "65 x 40 mm Stjerne", maxLanes: 4, labelsPerClick: 72, extraClicks: 18 },
   { id: "kombucha_bagside_65x85", label: "65 x 85 mm Kombucha Bagside", maxLanes: 4, labelsPerClick: 32, extraClicks: 18 },
   { id: "tee_dawn_68x90", label: "68 x 90 mm Tee Dawn", maxLanes: 3, labelsPerClick: 36, extraClicks: 18 },
   { id: "mm70x50_S", label: '70 x 50 mm " S "', maxLanes: 4, labelsPerClick: 64, extraClicks: 18 },
