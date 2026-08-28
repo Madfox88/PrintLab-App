@@ -38,7 +38,7 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
       const searchableText = `${product.label} ${product.id} ${product.isCustom ? 'custom' : 'standard'}`.toLowerCase();
       return searchableText.includes(query);
     });
-  }, [productSearch, products, selectedProductId]);
+  }, [productSearch, products]);
 
   // Calculate effective lanes (clamped to maxLanes)
   const designsWithEffectiveLanes = useMemo(() => {

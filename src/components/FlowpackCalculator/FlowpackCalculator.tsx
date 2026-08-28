@@ -9,6 +9,8 @@ import {
 } from '../../config/flowpackConfig';
 
 export function FlowpackCalculator() {
+  const KG_ADJUSTMENT_PER_DESIGN = 2;
+
   const [designs, setDesigns] = useState<FlowpackDesignRow[]>([
     { id: generateId(), name: 'Design 1', kg: 0, lanes: 0 },
   ]);
@@ -39,6 +41,10 @@ export function FlowpackCalculator() {
 
     if (active.length === 0) return null;
 
+    const enteredKgTotal = active.reduce((sum, d) => sum + d.kg, 0);
+    const adjustmentKg = active.length * KG_ADJUSTMENT_PER_DESIGN;
+    const adjustedKgTotal = enteredKgTotal + adjustmentKg;
+
     let mode: string;
     let kgForTable: number;
     let base: { clicks: number; meters: number };
@@ -46,7 +52,7 @@ export function FlowpackCalculator() {
     if (active.length === 1 && active[0].effectiveLanes === 3) {
       // "3 ens FP" mode
       mode = '3 ens FP';
-      kgForTable = active[0].kg;
+      kgForTable = active[0].kg + KG_ADJUSTMENT_PER_DESIGN;
       base = flowpackInterpolate(
         kgForTable,
         FLOWPACK_CONFIG.kgPoints,
@@ -56,8 +62,7 @@ export function FlowpackCalculator() {
     } else {
       // "1 FP pr lane" mode
       mode = '1 FP pr lane';
-      const totalKg = active.reduce((sum, d) => sum + d.kg, 0);
-      kgForTable = totalKg / 3;
+      kgForTable = adjustedKgTotal / 3;
       base = flowpackInterpolate(
         kgForTable,
         FLOWPACK_CONFIG.kgPoints,
@@ -66,8 +71,7 @@ export function FlowpackCalculator() {
       );
     }
 
-    const totalKgAll = active.reduce((sum, d) => sum + d.kg, 0);
-    const final = flowpackFinalize(base, totalKgAll);
+    const final = flowpackFinalize(base, adjustedKgTotal);
     const usedLanes = active.reduce((sum, d) => sum + d.effectiveLanes, 0);
 
     return {
@@ -75,7 +79,9 @@ export function FlowpackCalculator() {
       kgForTable,
       clicks: final.clicks,
       meters: final.meters,
-      totalKg: totalKgAll,
+      enteredKgTotal,
+      adjustmentKg,
+      totalKg: adjustedKgTotal,
       usedLanes,
       active,
     };
@@ -285,7 +291,12 @@ export function FlowpackCalculator() {
             </span>
           ) : (
             <>
-              Total kg entered: <strong>{formatNumber(results.totalKg)}</strong>
+              Total kg entered: <strong>{formatNumber(results.enteredKgTotal)}</strong>
+              <br />
+              Adjustment (+{KG_ADJUSTMENT_PER_DESIGN} kg/design):{' '}
+              <strong>{formatNumber(results.adjustmentKg)}</strong>
+              <br />
+              Total kg used for calculation: <strong>{formatNumber(results.totalKg)}</strong>
               <br />
               Total lanes used:{' '}
               <strong>

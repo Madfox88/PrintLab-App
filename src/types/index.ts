@@ -99,7 +99,7 @@ export interface ResultRow {
 }
 
 // Calculator Tab Types
-export type CalculatorTab = 'label' | 'flowpack' | 'candyjar' | 'coronauv' | 'rolllength';
+export type CalculatorTab = 'label' | 'flowpack' | 'candyjar' | 'coronauv' | 'rolllength' | 'diecut';
 
 // Storage Keys
 export const STORAGE_KEYS = {

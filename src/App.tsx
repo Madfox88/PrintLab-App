@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import './App.css';
 import Lottie from 'lottie-react';
 import printlabAnimation from './assets/printlab_lottie.json';
@@ -8,12 +8,52 @@ import {
   CandyJarCalculator,
   CoronaUvCalculator,
   RollLengthCalculator,
+  DieCutCalculator,
 } from './components';
 import type { CalculatorTab } from './types';
+import { cloneSeed, type SavedState } from './features/dieCut/src/die-cut-engine';
+import type { DieCutTabExports, DieCutTabOutput } from './components/DieCutCalculator';
+
+const DIE_CUT_PARENT_STORAGE_KEY = 'printlab_diecut_parent_state';
+
+function loadInitialDieCutState(): SavedState {
+  try {
+    const stored = localStorage.getItem(DIE_CUT_PARENT_STORAGE_KEY);
+    if (!stored) return cloneSeed();
+
+    const parsed = JSON.parse(stored) as SavedState;
+    if (
+      parsed.schemaVersion === 1 &&
+      Array.isArray(parsed.pressProfiles) &&
+      Array.isArray(parsed.finisherProfiles) &&
+      Array.isArray(parsed.dieSpecifications) &&
+      typeof parsed.activeDieId === 'string'
+    ) {
+      return parsed;
+    }
+  } catch (error) {
+    console.error('Failed to load die-cut parent state:', error);
+  }
+
+  return cloneSeed();
+}
+
+function saveDieCutParentState(state: SavedState) {
+  try {
+    localStorage.setItem(DIE_CUT_PARENT_STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error('Failed to save die-cut parent state:', error);
+  }
+}
 
 function App() {
   const [activeTab, setActiveTab] = useState<CalculatorTab>('label');
   const [labelTotalClicks, setLabelTotalClicks] = useState<number | null>(null);
+  const [dieCutState, setDieCutState] = useState<SavedState>(() => loadInitialDieCutState());
+  const dieCutOutputRef = useRef<DieCutTabOutput | null>(null);
+  const dieCutExportRef = useRef<DieCutTabExports | null>(null);
+
+  const dieCutInput = useMemo(() => ({ initialState: dieCutState }), [dieCutState]);
 
   const tabs: { id: CalculatorTab; label: string }[] = [
     { id: 'label', label: 'Label Calculator' },
@@ -21,7 +61,21 @@ function App() {
     { id: 'candyjar', label: 'Candy Jar Calculator' },
     { id: 'coronauv', label: 'Corona & UV Calculator' },
     { id: 'rolllength', label: 'Roll Length Calculator' },
+    { id: 'diecut', label: 'Die Cut Calculator' },
   ];
+
+  const handleDieCutChange = useCallback((output: DieCutTabOutput) => {
+    dieCutOutputRef.current = output;
+  }, []);
+
+  const handleDieCutSave = useCallback((state: SavedState) => {
+    setDieCutState(state);
+    saveDieCutParentState(state);
+  }, []);
+
+  const handleDieCutExport = useCallback((payload: DieCutTabExports) => {
+    dieCutExportRef.current = payload;
+  }, []);
 
   return (
     <>
@@ -94,6 +148,14 @@ function App() {
           {activeTab === 'candyjar' && <CandyJarCalculator />}
           {activeTab === 'coronauv' && <CoronaUvCalculator />}
           {activeTab === 'rolllength' && <RollLengthCalculator />}
+          {activeTab === 'diecut' && (
+            <DieCutCalculator
+              input={dieCutInput}
+              onChange={handleDieCutChange}
+              onSave={handleDieCutSave}
+              onExport={handleDieCutExport}
+            />
+          )}
         </main>
       </div>
     </div>

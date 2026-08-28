@@ -4,12 +4,12 @@ import type { FlowpackConfig } from '../types';
 export const FLOWPACK_CONFIG: FlowpackConfig = {
   maxLanesTotal: 3,
   kgPoints: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100],
-  // "1 FP pr lane" (mix mode)
-  clicks1: [90, 165, 235, 315, 385, 455, 530, 605, 671, 830, 1125, 1495],
-  meters1: [80, 150, 220, 295, 360, 435, 505, 580, 645, 795, 1090, 1440],
-  // "3 ens FP" (same design on all 3 lanes)
-  clicks3: [35, 60, 85, 110, 135, 155, 180, 205, 230, 280, 380, 500],
-  meters3: [25, 45, 70, 95, 115, 140, 165, 190, 210, 260, 360, 475],
+  // "1 FP pr lane" (mix mode), rebuilt for 45-layout yield (scaled by 48/45)
+  clicks1: [96, 176, 251, 336, 411, 486, 566, 646, 716, 886, 1200, 1595],
+  meters1: [86, 160, 235, 315, 384, 464, 539, 619, 688, 848, 1163, 1536],
+  // "3 ens FP" (same design on all 3 lanes), rebuilt for 45-layout yield (scaled by 48/45)
+  clicks3: [38, 64, 91, 118, 144, 166, 192, 219, 246, 299, 406, 534],
+  meters3: [27, 48, 75, 102, 123, 150, 176, 203, 224, 278, 384, 507],
 };
 
 // Interpolation function for flowpack calculations
