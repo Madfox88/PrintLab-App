@@ -95,8 +95,10 @@ export function flowpackFinalize(
   const adjustedClicks = baseClicks + kg * EXTRA_CLICKS_PER_KG + SAFETY_CLICKS;
 
   const clicks = Math.ceil(adjustedClicks);
-  const mPerClick = baseMeters / baseClicks;
-  const meters = Math.round((clicks * mPerClick) / 5) * 5;
+
+  // Flowpack-specific rule: 1 click = 1 meter.
+  // This stays isolated to flowpack calculations and does not affect other calculators.
+  const meters = clicks;
 
   return { clicks, meters };
 }

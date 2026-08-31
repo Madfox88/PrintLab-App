@@ -72,13 +72,16 @@ export function FlowpackCalculator() {
     }
 
     const final = flowpackFinalize(base, adjustedKgTotal);
+    const totalLength = final.meters;
+    const referenceStop = Math.max(totalLength - 15, 0);
     const usedLanes = active.reduce((sum, d) => sum + d.effectiveLanes, 0);
 
     return {
       mode,
       kgForTable,
       clicks: final.clicks,
-      meters: final.meters,
+      meters: totalLength,
+      referenceStop,
       enteredKgTotal,
       adjustmentKg,
       totalKg: adjustedKgTotal,
@@ -298,6 +301,10 @@ export function FlowpackCalculator() {
               <br />
               Total kg used for calculation: <strong>{formatNumber(results.totalKg)}</strong>
               <br />
+              Total length: <strong>{formatNumber(results.meters)} m</strong>
+              <br />
+              Reference stop: <strong>{formatNumber(results.referenceStop)} m</strong>
+              <br />
               Total lanes used:{' '}
               <strong>
                 {results.usedLanes} / {FLOWPACK_CONFIG.maxLanesTotal}
@@ -313,8 +320,8 @@ export function FlowpackCalculator() {
               </span>
               <br />
               <span style={{ fontSize: '15px' }}>
-                <strong style={{ color: 'var(--accent)' }}>Approx. diecut stop:</strong>{' '}
-                <strong style={{ color: '#f97373' }}>{formatNumber(results.meters)} m</strong>
+                <strong style={{ color: 'var(--accent)' }}>Operator stop reference:</strong>{' '}
+                <strong style={{ color: '#f97373' }}>{formatNumber(results.referenceStop)} m</strong>
               </span>
             </>
           )}
