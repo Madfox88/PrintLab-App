@@ -19,8 +19,8 @@ export function CandyJarCalculator() {
         </div>
         <p className="muted">
           For candy jars on Midi and Maxi. Choose product type and how many jars to
-          produce. The result follows your internal planning table (kg, clicks and
-          approximate diecut stop).
+          produce. The calculator adds <strong>2 kg</strong> per job for adjustment of
+          diecut and wrapping machines.
         </p>
 
         <div className="controls-row controls-row-left">
@@ -64,11 +64,17 @@ export function CandyJarCalculator() {
               <br />
               Jars to produce: <strong>{formatNumber(jarCount)}</strong>
               <br />
-              Approx. weight: <strong>{results.kg.toFixed(1)}</strong> kg
+              Approx. candy weight: <strong>{results.kg.toFixed(1)}</strong> kg
+              <br />
+              Adjustment: <strong>{results.adjustmentKg.toFixed(1)}</strong> kg
+              <br />
+              Total kg used for calculation: <strong>{results.totalKg.toFixed(1)}</strong> kg
               <br />
               Total clicks: <strong>{formatNumber(results.clicks)}</strong>
               <br />
-              Approx. diecut stop: <strong>{results.meters}</strong> m
+              Total length: <strong>{formatNumber(results.meters)}</strong> m
+              <br />
+              Operator stop reference: <strong>{formatNumber(results.referenceStop)}</strong> m
             </>
           )}
         </div>
