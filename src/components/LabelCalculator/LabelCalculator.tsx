@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
+import { CircleHelp, Settings } from 'lucide-react';
 import type { DesignRow, LaneEntry, ResultRow } from '../../types';
 import { formatNumber, roundUpToNext10, clampLanes, generateId } from '../../utils';
 import { useProducts } from '../../hooks';
@@ -336,12 +337,15 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
   return (
     <div className="tab-panel active">
       {/* Quick Guide Toggle */}
-      <div className="sub-header">
-        <button className="help-toggle" onClick={() => setShowGuide(!showGuide)}>
-          <span className="help-toggle-icon">?</span>
+      <div className="sub-header label-sub-header">
+        <button className="help-toggle" onClick={() => setShowGuide(!showGuide)} aria-label="Quick guide">
+          <CircleHelp className="help-toggle-icon" aria-hidden="true" />
           <span>Quick guide</span>
         </button>
-        <button onClick={() => setShowProductManager(true)}>⚙️ Manage Products</button>
+        <button onClick={() => setShowProductManager(true)} aria-label="Manage products">
+          <Settings aria-hidden="true" />
+          <span>Manage Products</span>
+        </button>
       </div>
 
       {showGuide && (
@@ -463,7 +467,7 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
         <div className="designs-lanes">
           <div className="designs-header">
             <div className="designs-header-left">
-              <button onClick={addDesign}>+ Add design</button>
+              <button className="desktop-add-design" onClick={addDesign}>+ Add design</button>
             </div>
             <div className="lane-meta">
               <span className="lane-chip">Max lanes: {maxLanes || '—'}</span>
@@ -528,6 +532,8 @@ export function LabelCalculator({ onResultChange }: LabelCalculatorProps = {}) {
             </div>
           ))}
         </div>
+
+        <button className="mobile-add-design" onClick={addDesign}>+ Add design</button>
 
         {lanesClamped && selectedProduct && (
           <div className="error-text">

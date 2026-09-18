@@ -1,6 +1,17 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import './App.css';
 import Lottie from 'lottie-react';
+import {
+  ArrowRight,
+  Candy,
+  Ellipsis,
+  PackageOpen,
+  Ruler,
+  Scissors,
+  Sparkles,
+  Tag,
+  type LucideIcon,
+} from 'lucide-react';
 import printlabAnimation from './assets/printlab_lottie.json';
 import {
   LabelCalculator,
@@ -55,14 +66,26 @@ function App() {
 
   const dieCutInput = useMemo(() => ({ initialState: dieCutState }), [dieCutState]);
 
-  const tabs: { id: CalculatorTab; label: string }[] = [
-    { id: 'label', label: 'Label Calculator' },
-    { id: 'flowpack', label: 'Flowpack Calculator' },
-    { id: 'candyjar', label: 'Candy Jar Calculator' },
-    { id: 'coronauv', label: 'Corona & UV Calculator' },
-    { id: 'rolllength', label: 'Roll Length Calculator' },
-    { id: 'diecut', label: 'Die Cut Calculator' },
+  const tabs: { id: CalculatorTab; label: string; icon: LucideIcon }[] = [
+    { id: 'label', label: 'Label Calculator', icon: Tag },
+    { id: 'flowpack', label: 'Flowpack Calculator', icon: PackageOpen },
+    { id: 'candyjar', label: 'Candy Jar Calculator', icon: Candy },
+    { id: 'coronauv', label: 'Corona & UV Calculator', icon: Sparkles },
+    { id: 'rolllength', label: 'Roll Length Calculator', icon: Ruler },
+    { id: 'diecut', label: 'Die Cut Calculator', icon: Scissors },
   ];
+
+  const activeTabLabel = tabs.find((tab) => tab.id === activeTab)?.label;
+  const mobilePrimaryTabs = tabs.filter((tab) =>
+    ['label', 'flowpack', 'candyjar', 'diecut'].includes(tab.id)
+  );
+  const mobileMoreTabs = tabs.filter((tab) => ['coronauv', 'rolllength'].includes(tab.id));
+
+  const handleMobileTabChange = (tab: CalculatorTab, details?: HTMLDetailsElement | null) => {
+    setActiveTab(tab);
+    details?.removeAttribute('open');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleDieCutChange = useCallback((output: DieCutTabOutput) => {
     dieCutOutputRef.current = output;
@@ -120,6 +143,7 @@ function App() {
             <path d="M340.699,97.743l-17.835,-25.482l0,25.482l-10.874,0l0,-42.179l11.193,0l17.073,24.283l0,-24.283l10.938,0l0,42.179l-10.494,0Z" style={{fill:"#f1f2f2", fillRule:"nonzero"}}/>
             <path d="M381.345,54.87c9.232,0 14.92,4.554 18.02,9.803l-9.104,4.806c-1.709,-2.784 -4.93,-4.997 -8.916,-4.997c-6.894,0 -11.76,5.313 -11.76,12.204c0,6.894 4.866,12.207 11.76,12.207c3.288,0 6.26,-1.138 7.969,-2.532l0,-3.54l-9.678,0l0,-9.044l20.364,0l0,16.505c-4.554,4.994 -10.686,8.217 -18.655,8.217c-12.583,0 -22.826,-8.409 -22.826,-21.815c0,-13.403 10.242,-21.815 22.826,-21.815" style={{fill:"#f1f2f2", fillRule:"nonzero"}}/>
           </svg>
+          <span className="mobile-page-title">{activeTabLabel}</span>
         </div>
         <Lottie animationData={printlabAnimation} loop={true} className="badge" />
       </header>
@@ -159,11 +183,58 @@ function App() {
         </main>
       </div>
     </div>
+
+    <nav className="mobile-nav" aria-label="Calculators">
+      {mobilePrimaryTabs.map((tab) => {
+        const Icon = tab.icon;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            className={`mobile-nav-button ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => handleMobileTabChange(tab.id)}
+            aria-label={tab.label}
+            title={tab.label}
+          >
+            <Icon aria-hidden="true" />
+          </button>
+        );
+      })}
+      <details className={`mobile-more ${mobileMoreTabs.some((tab) => tab.id === activeTab) ? 'active' : ''}`}>
+        <summary aria-label="More calculators" title="More calculators">
+          <Ellipsis aria-hidden="true" />
+        </summary>
+        <div className="mobile-more-menu">
+          {mobileMoreTabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                className={activeTab === tab.id ? 'active' : ''}
+                onClick={(event) => handleMobileTabChange(tab.id, event.currentTarget.closest('details'))}
+              >
+                <Icon aria-hidden="true" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </details>
+    </nav>
     
     {activeTab === 'label' && labelTotalClicks !== null && (
       <div className="sidebar-result">
         <div className="sidebar-result-label">Total Clicks</div>
         <div className="sidebar-result-value">{labelTotalClicks.toLocaleString()}</div>
+        <button
+          type="button"
+          className="sidebar-result-action"
+          onClick={() => document.querySelector('.results-grid')?.scrollIntoView({ behavior: 'smooth' })}
+        >
+          Breakdown
+          <ArrowRight aria-hidden="true" />
+        </button>
       </div>
     )}
     </>

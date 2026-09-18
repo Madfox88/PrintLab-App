@@ -183,7 +183,7 @@ export function FlowpackCalculator() {
         <div className="designs-lanes">
           <div className="designs-header">
             <div className="designs-header-left">
-              <button onClick={addDesign}>+ Add flowpack design</button>
+              <button className="desktop-add-design" onClick={addDesign}>+ Add flowpack design</button>
             </div>
             <div className="lane-meta">
               <span className="lane-chip">Max lanes: {maxLanes}</span>
@@ -203,7 +203,7 @@ export function FlowpackCalculator() {
           </div>
         </div>
 
-        <div className="table-wrapper" ref={tableRef}>
+        <div className="table-wrapper flowpack-table" ref={tableRef}>
           <table>
             <thead>
               <tr>
@@ -221,8 +221,8 @@ export function FlowpackCalculator() {
                 const isActive = design.kg > 0 && effective.effectiveLanes > 0;
                 return (
                   <tr key={design.id}>
-                    <td>{design.name}</td>
-                    <td>
+                    <td className="flowpack-design-name">{design.name}</td>
+                    <td data-label="Kilos of candy">
                       <input
                         type="number"
                         className="number-input"
@@ -237,7 +237,7 @@ export function FlowpackCalculator() {
                         onKeyDown={handleEnterMove}
                       />
                     </td>
-                    <td>
+                    <td data-label="Lanes">
                       <input
                         type="number"
                         className="number-input"
@@ -252,8 +252,8 @@ export function FlowpackCalculator() {
                         onKeyDown={handleEnterMove}
                       />
                     </td>
-                    <td>{isActive && results ? formatNumber(results.clicks) : ''}</td>
-                    <td>{isActive && results ? results.meters : ''}</td>
+                    <td data-label="Clicks to print">{isActive && results ? formatNumber(results.clicks) : '—'}</td>
+                    <td data-label="Diecut stop (m)">{isActive && results ? results.meters : '—'}</td>
                     <td className="row-actions">
                       <button
                         className="btn-secondary"
@@ -274,6 +274,8 @@ export function FlowpackCalculator() {
             </tbody>
           </table>
         </div>
+
+        <button className="mobile-add-design" onClick={addDesign}>+ Add flowpack design</button>
 
         {lanesClamped && (
           <div className="error-text">
